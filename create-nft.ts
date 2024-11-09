@@ -55,7 +55,7 @@ const mint = generateSigner(umi);
 const transaction = await createNft(umi, {
   mint,
   name: "My FAVORITE WAIFU NFT",
-  uri: "https://w0.peakpx.com/wallpaper/117/377/HD-wallpaper-rem-rezero-girl-waifu.jpg",
+  uri: "https://raw.githubusercontent.com/soumalya340/Solana_Waifu_NFT/refs/heads/main/nft-metadata.json",
   sellerFeeBasisPoints: percentAmount(0),
   collection: {
     key: collectionAddress,
