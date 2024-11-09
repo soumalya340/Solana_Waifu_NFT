@@ -18,6 +18,7 @@ import {
   generateSigner,
   keypairIdentity,
   percentAmount,
+  publicKey,
 } from "@metaplex-foundation/umi";
 
 const connection = new Connection(clusterApiUrl("devnet"));
@@ -43,30 +44,33 @@ umi.use(keypairIdentity(umiUser));
 
 console.log("SetUp up Umi instance for user");
 
-const collectionMint = generateSigner(umi);
+const collectionAddress = publicKey(
+  "J6z4CRJv8tDwVeTHaY8zXXKLvsfeBFz4hGCzRjckL72t"
+);
+
+console.log(`Creating NFT.....`)
+
+const mint = generateSigner(umi);
 
 const transaction = await createNft(umi, {
-  mint: collectionMint,
-  name: "My Waifu NFT",
-  symbol: "MW",
-  uri: "https://raw.githubusercontent.com/soumalya340/Solana_Waifu_NFT/refs/heads/main/metadata.json",
+  mint,
+  name: "My FAVORITE WAIFU NFT",
+  uri: "https://w0.peakpx.com/wallpaper/117/377/HD-wallpaper-rem-rezero-girl-waifu.jpg",
   sellerFeeBasisPoints: percentAmount(0),
-  isCollection: true,
+  collection: {
+    key: collectionAddress,
+    verified: false,
+  },
 });
 
 await transaction.sendAndConfirm(umi);
 
-const createdCollectionNft = await fetchDigitalAsset(
-  umi,
-  collectionMint.publicKey
-);
+const createdNft = await fetchDigitalAsset(umi, mint.publicKey);
 
 console.log(
-  `Created Collection 📦! Address is ${getExplorerLink(
+  `🖼️ Created NFT! Address is ${getExplorerLink(
     "address",
-    createdCollectionNft.mint.publicKey,
+    createdNft.mint.publicKey,
     "devnet"
   )}`
 );
-
-

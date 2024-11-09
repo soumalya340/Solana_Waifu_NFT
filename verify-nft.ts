@@ -1,7 +1,10 @@
 import {
   createNft,
   fetchDigitalAsset,
+  findMetadataPda,
   mplTokenMetadata,
+  verifyCollection,
+  verifyCollectionV1,
 } from "@metaplex-foundation/mpl-token-metadata";
 
 import {
@@ -18,6 +21,7 @@ import {
   generateSigner,
   keypairIdentity,
   percentAmount,
+  publicKey,
 } from "@metaplex-foundation/umi";
 
 const connection = new Connection(clusterApiUrl("devnet"));
@@ -43,30 +47,26 @@ umi.use(keypairIdentity(umiUser));
 
 console.log("SetUp up Umi instance for user");
 
-const collectionMint = generateSigner(umi);
+const collectionAddress = publicKey(
+  "CvBMs2LEp8KbfCvPNMawR5cFyQ1k9ac7xrtCoxu1Y2gH"
+);
 
-const transaction = await createNft(umi, {
-  mint: collectionMint,
-  name: "My Waifu NFT",
-  symbol: "MW",
-  uri: "https://raw.githubusercontent.com/soumalya340/Solana_Waifu_NFT/refs/heads/main/metadata.json",
-  sellerFeeBasisPoints: percentAmount(0),
-  isCollection: true,
+const nftAddress = publicKey("J6z4CRJv8tDwVeTHaY8zXXKLvsfeBFz4hGCzRjckL72t");
+
+// const transaction = await verifyCollection(umi,{
+//     metadata: findMetadataPda(umi, {mint: nftAddress}),
+//     collectionMint: collectionAddress,
+//     authority: umi.identity    
+// });
+
+const transaction = await verifyCollectionV1(umi, {
+  metadata: findMetadataPda(umi, { mint: nftAddress }),
+  collectionMint: collectionAddress,
+  authority: umi.identity,
 });
 
-await transaction.sendAndConfirm(umi);
 
-const createdCollectionNft = await fetchDigitalAsset(
-  umi,
-  collectionMint.publicKey
-);
+transaction.sendAndConfirm(umi);
 
-console.log(
-  `Created Collection 📦! Address is ${getExplorerLink(
-    "address",
-    createdCollectionNft.mint.publicKey,
-    "devnet"
-  )}`
-);
-
-
+console.log(`✅ NFT ${nftAddress} verified as member of collection ${collectionAddress}! 
+    See Explorer at ${getExplorerLink("address",nftAddress,"devnet")}`);
